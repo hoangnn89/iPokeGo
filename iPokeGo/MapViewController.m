@@ -163,8 +163,8 @@
 -(void)sendNewLocationToServer:(CLLocationDegrees)latitude and:(CLLocationDegrees)longitude
 {
     NSString *requestStr   = self.requestNewLocationStr;
-    requestStr  = [self.requestNewLocationStr stringByReplacingOccurrencesOfString:@"%%latitude%%" withString:[NSString stringWithFormat:@"%f", latitude]];
-    requestStr  = [requestStr stringByReplacingOccurrencesOfString:@"%%longitude%%" withString:[NSString stringWithFormat:@"%f", longitude]];
+//    requestStr  = [self.requestNewLocationStr stringByReplacingOccurrencesOfString:@"%%latitude%%" withString:[NSString stringWithFormat:@"%f", latitude]];
+//    requestStr  = [requestStr stringByReplacingOccurrencesOfString:@"%%longitude%%" withString:[NSString stringWithFormat:@"%f", longitude]];
     
     /*************************************/
     //           Requête POST            //
@@ -175,8 +175,12 @@
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
     [request setURL:url];
     [request setHTTPMethod:@"POST"];
-    [request setValue:@"application/json;charset=UTF-8" forHTTPHeaderField:@"content-type"];
+//    [request setValue:@"application/json;charset=UTF-8" forHTTPHeaderField:@"content-type"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"content-type"];
+
     request.cachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+    NSString *query = [NSString stringWithFormat:@"lat=%f&lon=%f", latitude, longitude];//request.URL.query;
+    [request setHTTPBody:[query dataUsingEncoding:NSUTF8StringEncoding]];
     
     // Lancement de la requête
     [NSURLConnection sendAsynchronousRequest:request
