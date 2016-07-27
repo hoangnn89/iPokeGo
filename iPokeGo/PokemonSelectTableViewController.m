@@ -17,6 +17,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+    
     self.pokemonID          = [[NSMutableArray alloc] init];
     self.pokemonChecked     = [[NSMutableArray alloc] init];
     found                   = NO;
@@ -75,10 +77,10 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    PokemonTableViewCell *cell      = [tableView dequeueReusableCellWithIdentifier:@"pokemoncell" forIndexPath:indexPath];
+    UITableViewCell *cell      = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
     NSString *key                   = [NSString stringWithFormat:@"%d", ((int)indexPath.row + 1)];
     
-    cell.pokemonName.text           = [self.localization objectForKey:[NSString stringWithFormat:@"%@", key]];
+    cell.textLabel.text           = [self.localization objectForKey:[NSString stringWithFormat:@"%@", key]];
 
     UIImage *largeImage = [UIImage imageNamed : @"icons-hd.png"];
     
@@ -94,7 +96,7 @@
     CGRect cropRect = CGRectMake(x, y, SPRITE_SIZE, SPRITE_SIZE);
     
     CGImageRef imageRef = CGImageCreateWithImageInRect([largeImage CGImage], cropRect);
-    cell.pokemonimageView.image = [UIImage imageWithCGImage:imageRef];
+    cell.imageView.image = [UIImage imageWithCGImage:imageRef];
     CGImageRelease(imageRef);
     
     

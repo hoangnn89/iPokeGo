@@ -20,6 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
+    self.title = @"Poke Map";
     
     self.pokemons   = [[NSMutableArray alloc] init];
     self.pokestops  = [[NSMutableArray alloc] init];
