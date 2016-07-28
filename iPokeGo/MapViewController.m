@@ -48,12 +48,12 @@
     else
     {
         UIAlertController *alert = [UIAlertController
-                                    alertControllerWithTitle:@"Server not set"
-                                    message:@"Please go in settings to enter server address"
+                                    alertControllerWithTitle:NSLocalizedString(@"Server not set", @"The title of an alert that tells the user, that no server was set.")
+                                    message:NSLocalizedString(@"Please go in settings to enter server address", @"The message of an alert that tells the user, that no server was set.")
                                     preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction *ok = [UIAlertAction
-                             actionWithTitle:@"OK"
+                             actionWithTitle:NSLocalizedString(@"OK", @"A common affirmative action title, like 'OK' in english.")
                              style:UIAlertActionStyleDefault
                              handler:^(UIAlertAction * action)
                              {
@@ -147,7 +147,7 @@
         [prefs synchronize];
         
         dropPin.coordinate = locCoord;
-        dropPin.title = @"Scan location";
+        dropPin.title = NSLocalizedString(@"Scan location", @"The title of an annotation on the map to scan the location.");
         
         for (int i = 0; i < [self.mapview.annotations count]; i++) {
             MKPointAnnotation *annotation = (MKPointAnnotation *)self.mapview.annotations[i];
@@ -245,7 +245,7 @@
         radar = locCoord;
         
         dropPin.coordinate = locCoord;
-        dropPin.title = @"Scan location";
+        dropPin.title = NSLocalizedString(@"Scan location", @"The title of an annotation on the map to scan the location.");
         [self.mapview addAnnotation:dropPin];
     }
 }
@@ -257,30 +257,20 @@
     
     NSString *pathPokemonFavAppearSound    = [NSString stringWithFormat:@"%@/favoritePokemon.mp3", [[NSBundle mainBundle] resourcePath]];
     NSURL *soundUrlPokemonFavAppearSound   = [NSURL fileURLWithPath:pathPokemonFavAppearSound];
-    
+	
+	AVAudioSession *audiosession = [AVAudioSession sharedInstance];
+	[audiosession setCategory:AVAudioSessionCategoryAmbient error:nil];
+	
     pokemonAppearSound = [[AVAudioPlayer alloc] initWithContentsOfURL:soundUrlPokemonAppearSound error:nil];
     pokemonFavAppearSound = [[AVAudioPlayer alloc] initWithContentsOfURL:soundUrlPokemonFavAppearSound error:nil];
 }
 
--(void)loadLocalization
-{
-    NSString *language = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
+-(void)loadLocalization {
     NSError *error;
     
-    NSURL *filePath = nil;
+    NSURL *filePath = [[NSBundle mainBundle] URLForResource:@"pokemon" withExtension:@"json"];
     
     self.localization = [[NSDictionary alloc] init];
-    
-    if([language isEqualToString:@"fr"])
-        filePath = [[NSBundle mainBundle] URLForResource:@"pokemon.fr" withExtension:@"json"];
-    else if([language isEqualToString:@"de"])
-        filePath = [[NSBundle mainBundle] URLForResource:@"pokemon.de" withExtension:@"json"];
-    else if([language isEqualToString:@"en"])
-        filePath = [[NSBundle mainBundle] URLForResource:@"pokemon.en" withExtension:@"json"];
-    else if([language isEqualToString:@"zh_cn"])
-        filePath = [[NSBundle mainBundle] URLForResource:@"pokemon.zh_cn" withExtension:@"json"];
-    else
-        filePath = [[NSBundle mainBundle] URLForResource:@"pokemon.en" withExtension:@"json"];
     
     NSString *stringPath = [filePath absoluteString];
     NSData *localizationData = [NSData dataWithContentsOfURL:[NSURL URLWithString:stringPath]];
@@ -333,12 +323,12 @@
     {
         //Location Services is off from settings
         UIAlertController *alert = [UIAlertController
-                                      alertControllerWithTitle:@"Error"
-                                      message:@"Location denied, please go in settings to allow this app to use your location"
+                                      alertControllerWithTitle:NSLocalizedString(@"Location service denied", @"The title of an alert, that tells the user that he/she denied location access to the app.")
+                                      message:NSLocalizedString(@"Location denied, please go in settings to allow this app to use your location", @"The message of an alert, that tells the user that he/she denied location access to the app.")
                                       preferredStyle:UIAlertControllerStyleAlert];
         
         UIAlertAction *ok = [UIAlertAction
-                             actionWithTitle:@"OK"
+                             actionWithTitle:NSLocalizedString(@"OK", @"A common affirmative action title, like 'OK' in english.")
                              style:UIAlertActionStyleDefault
                              handler:nil];
         
@@ -450,14 +440,14 @@
                                                            
                                                            point.coordinate     = pokemonLocation;
                                                            point.title          = [self.localization objectForKey:[NSString stringWithFormat:@"%@", key]];
-                                                           point.subtitle       = [NSString stringWithFormat:@"Disappears at %02d:%02d:%02d", (int)hour, (int)minute, (int)second];
+                                                           point.subtitle       = [NSString localizedStringWithFormat:NSLocalizedString(@"Disappears at %02d:%02d:%02d", @"The hint in a annotation callout that indicates when a Pokémon disappears."), (int)hour, (int)minute, (int)second];
                                                            point.pokemonID      = [[self.pokemons[i] valueForKey:@"pokemon_id"] intValue];
                                                            
                                                            [self.mapview addAnnotation:point];
                                                            
                                                            if(!firstConnection)
                                                            {
-                                                               NSString *notificationMessage = [NSString stringWithFormat:@"%@ was added on the map !", point.title];
+                                                               NSString *notificationMessage = [NSString localizedStringWithFormat:NSLocalizedString(@"[Pokemon] was added to the map!", @"The hint that a certain Pokémon appeared on the map.") , point.title];
                                                                if([self.savedFavorite count] > 0)
                                                                {
                                                                    isFav = NO;
@@ -473,7 +463,7 @@
                                                                {
                                                                    NSLog(@"FAV Pokemon added on map !!");
                                                                    
-                                                                   notificationMessage = [NSString stringWithFormat:@"%@ your favorite pokemon was on the map !", point.title];
+                                                                   notificationMessage = [NSString localizedStringWithFormat:NSLocalizedString(@"[Pokemon] your favorite pokemon was added to the map!", @"The hint that a favorite Pokémon appeared on the map.") , point.title];
                                                                    
                                                                    if(isFavNotificationActivated)
                                                                    {
@@ -547,8 +537,8 @@
                                                    CLLocationCoordinate2D pokestopLocation = CLLocationCoordinate2DMake([self.pokestops[i][@"latitude"] floatValue], [self.pokestops[i][@"longitude"] floatValue]);
                                                    
                                                    point.coordinate = pokestopLocation;
-                                                   point.title      = @"Pokestop";
-                                                   point.subtitle   = @"This is a pokestop";
+                                                   point.title      = NSLocalizedString(@"Pokestop", @"The title of a Pokéstop annotation on the map.");
+                                                   point.subtitle   = NSLocalizedString(@"This is a pokestop", @"The message of a Pokéstop annotation on the map.");
                                                    point.pokestopID = [[self.pokestops[i] valueForKey:@"pokestop_id"] intValue];
                                                    
                                                    if([[self.pokestops[i] valueForKey:@"lure_expiration"] isKindOfClass:[NSNull class]])
@@ -590,8 +580,8 @@
                                                    CLLocationCoordinate2D gymLocation = CLLocationCoordinate2DMake([self.gyms[i][@"latitude"] floatValue], [self.gyms[i][@"longitude"] floatValue]);
                                                    
                                                    point.coordinate     = gymLocation;
-                                                   point.title          = @"Gym";
-                                                   point.subtitle       = [NSString stringWithFormat:@"Gym points : %d", [self.gyms[i][@"gym_points"] intValue]];
+                                                   point.title          = NSLocalizedString(@"Gym", @"The title of a gym annotation on the map.");
+                                                   point.subtitle       = [NSString localizedStringWithFormat:NSLocalizedString(@"Gym points: %d", @"The description of a gym annotation on the map with points."), [self.gyms[i][@"gym_points"] intValue]];
                                                    point.gymsID         = [[self.gyms[i] valueForKey:@"team_id"] intValue];
                                                    point.guardPokemonID = [[self.gyms[i] valueForKey:@"guard_pokemon_id"] intValue];
                                                    point.gym_points     = [[self.gyms[i] valueForKey:@"gym_points"] intValue];
