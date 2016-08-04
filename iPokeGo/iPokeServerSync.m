@@ -32,6 +32,45 @@ static NSURLSession *iPokeServerSyncSharedSession;
     return iPokeServerSyncSharedSession;
 }
 
+- (void)setLocationAtLocNE:(CLLocationCoordinate2D)locNE
+                     locSW:(CLLocationCoordinate2D)locSW {
+    NSString *requestString = [NSString stringWithFormat:@"https://api.goradar.io/raw_data?&swLat=%f&swLng=%f&neLat=%f&neLng=%f&pokemon=true&pokestops=false&gyms=false", locSW.latitude, locSW.longitude, locNE.latitude, locNE.longitude];
+    
+    NSURL *url = [NSURL URLWithString:requestString];
+    if (!url) {
+        return;
+    }
+    if (!url) {
+        return;
+    }
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    NSURLSessionDataTask *task = [[iPokeServerSync sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            if (httpResponse.statusCode != 200) {
+                NSLog(@"Server returned non 200 code: %@", @(httpResponse.statusCode));
+                return;
+            }
+        }
+        
+        if (error) {
+            NSLog(@"Error reading server's data: %@", error);
+            return;
+        }
+        
+        NSString *dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        if([dataStr isEqualToString:@"ok"]) {
+            NSLog(@"Position changed !");
+        } else {
+            NSLog(@"Error changing pinned location, server responded: %@", dataStr);
+        }
+    }];
+    [task resume];
+
+}
+
 - (void)setLocation:(CLLocationCoordinate2D)location
 {
     NSURL *url = [self buildChangeLocationRequestURLWithLocation:location];
@@ -63,6 +102,48 @@ static NSURLSession *iPokeServerSyncSharedSession;
         }
     }];
     [task resume];
+}
+
+- (void)fetchDataAtLocNE:(CLLocationCoordinate2D)locNE
+                   locSW:(CLLocationCoordinate2D)locSW {
+    NSString *requestString = [NSString stringWithFormat:@"https://api.goradar.io/raw_data?&swLat=%f&swLng=%f&neLat=%f&neLng=%f&pokemon=true&pokestops=false&gyms=false", locSW.latitude, locSW.longitude, locNE.latitude, locNE.longitude];
+    
+    NSURL *url = [NSURL URLWithString:requestString];
+    if (!url) {
+        return;
+    }
+    NSURLSessionDataTask *task = [[iPokeServerSync sharedSession] dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if ([response isKindOfClass:[NSHTTPURLResponse class]]) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            if (httpResponse.statusCode != 200) {
+                NSLog(@"Server returned non 200 code: %@", @(httpResponse.statusCode));
+                return;
+            }
+        }
+        
+        if (error) {
+            NSLog(@"Error reading server's data: %@", error);
+            return;
+        }
+        
+        NSDictionary *jsonData = [NSJSONSerialization
+                                  JSONObjectWithData:data
+                                  options:NSJSONReadingMutableContainers
+                                  error:&error];
+        
+        if (!jsonData || error) {
+            NSLog(@"Error processing server's data: %@", error);
+            return;
+        }
+        NSLog(@"Fetched data");
+        NSManagedObjectContext *context = [[CoreDataPersistance sharedInstance] newWorkerContext];
+        [self processPokemonFromJSON:jsonData[@"pokemons"] usingContext:context];
+        [self processStopsFromJSON:jsonData[@"pokestops"] usingContext:context];
+        [self processGymsFromJSON:jsonData[@"gyms"] usingContext:context];
+        [[CoreDataPersistance sharedInstance] commitChangesAndDiscardContext:context];
+    }];
+    [task resume];
+
 }
 
 -(void)fetchData
@@ -106,6 +187,7 @@ static NSURLSession *iPokeServerSyncSharedSession;
 
 -(NSURL *)buildLoadDataRequestURL
 {
+    
     // Build Request
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSString *server_addr           = [defaults objectForKey:@"server_addr"];
@@ -134,6 +216,7 @@ static NSURLSession *iPokeServerSyncSharedSession;
 
 - (NSURL *)buildChangeLocationRequestURLWithLocation:(CLLocationCoordinate2D)location
 {
+    
     NSUserDefaults *defaults        = [NSUserDefaults standardUserDefaults];
     NSString *server_addr           = [defaults objectForKey:@"server_addr"];
     

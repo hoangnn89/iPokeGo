@@ -164,7 +164,17 @@ static NSTimeInterval AppDelegatServerRefreshFrequencyBackground = 20.0;
 - (void)refreshDataFromServer
 {
     dispatch_async(AppDelegateFetcherQueue, ^{
-        [self.server fetchData];
+        self.notifier.mapViewController = ((UINavigationController *)self.window.rootViewController).viewControllers.firstObject;
+
+        MKMapRect mapRect = self.notifier.mapViewController.mapview.visibleMapRect;
+        
+        MKMapPoint cornerPointNE = MKMapPointMake(mapRect.origin.x + mapRect.size.width, mapRect.origin.y);
+        CLLocationCoordinate2D cornerCoordinateNE = MKCoordinateForMapPoint(cornerPointNE);
+        
+        MKMapPoint cornerPointSW = MKMapPointMake(mapRect.origin.x, mapRect.origin.y + mapRect.size.height);
+        CLLocationCoordinate2D cornerCoordinateSW = MKCoordinateForMapPoint(cornerPointSW);
+        
+        [self.server fetchDataAtLocNE:cornerCoordinateNE locSW:cornerCoordinateSW];
     });
 }
 

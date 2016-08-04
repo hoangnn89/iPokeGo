@@ -23,6 +23,8 @@ NSString * const BackgroundSettingChangedNotification = @"Poke.BackgroundSetting
     [super viewDidLoad];
     
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName : [UIColor whiteColor]};
+    
+    self.serverField.enabled = NO;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -35,9 +37,23 @@ NSString * const BackgroundSettingChangedNotification = @"Poke.BackgroundSetting
 {
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     
-    self.serverField.text = [prefs valueForKey:@"server_addr"];
+    self.serverField.text = @"PokeMaps";//[prefs valueForKey:@"server_addr"];
     
     [self.backgroundSwitch setOn:[prefs boolForKey:@"run_in_background"]];
+}
+
+- (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(nullable id)sender {
+
+    if([identifier isEqualToString:@"showPokeStops"] ||
+       [identifier isEqualToString:@"showGyms"]) {
+
+        [self showMessage:@"Coming soon!"
+                withTitle:@"PokeMaps"];
+
+        return NO;
+    }
+    
+    return YES;
 }
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -92,6 +108,25 @@ NSString * const BackgroundSettingChangedNotification = @"Poke.BackgroundSetting
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+//Method
+
+-(void)showMessage:(NSString*)message withTitle:(NSString *)title
+{
+    
+    UIAlertController * alert=   [UIAlertController
+                                  alertControllerWithTitle:title
+                                  message:message
+                                  preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
+        
+        //do something when click button
+    }];
+    [alert addAction:okAction];
+
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 @end

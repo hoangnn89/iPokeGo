@@ -187,8 +187,16 @@ BOOL regionChangeRequested = YES;
         }
         [self.mapview addAnnotation:dropPin];
         
+        MKMapRect mapRect = self.mapview.visibleMapRect;
+
+        MKMapPoint cornerPointNE = MKMapPointMake(mapRect.origin.x + mapRect.size.width, mapRect.origin.y);
+        CLLocationCoordinate2D cornerCoordinateNE = MKCoordinateForMapPoint(cornerPointNE);
+        
+        MKMapPoint cornerPointSW = MKMapPointMake(mapRect.origin.x, mapRect.origin.y + mapRect.size.height);
+        CLLocationCoordinate2D cornerCoordinateSW = MKCoordinateForMapPoint(cornerPointSW);
+
         iPokeServerSync *server = [[iPokeServerSync alloc] init];
-        [server setLocation:location];
+        [server setLocationAtLocNE:cornerCoordinateNE locSW:cornerCoordinateSW];
         
         [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:location.latitude] forKey:@"radar_lat"];
         [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:location.longitude] forKey:@"radar_long"];
