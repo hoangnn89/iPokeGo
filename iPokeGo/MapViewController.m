@@ -681,6 +681,29 @@
     return returnState;
 }
 
+- (UIImage*)pokemonIcon:(int)pokemonID {
+    UIImage *largeImage = [UIImage imageNamed : @"icons-hd.png"];
+    
+    /* Spritesheet has 7 columns */
+    int x = (pokemonID - 1)%SPRITESHEET_COLS*SPRITE_SIZE;
+    
+    int y = pokemonID;
+    
+    while(y%SPRITESHEET_COLS != 0) y++;
+    
+    y = (y/SPRITESHEET_COLS - 1) * SPRITE_SIZE;
+    
+    CGRect cropRect = CGRectMake(x, y, SPRITE_SIZE, SPRITE_SIZE);
+    
+    CGImageRef imageRef = CGImageCreateWithImageInRect([largeImage CGImage], cropRect);
+    
+    UIImage *image = [UIImage imageWithCGImage:imageRef];
+    
+    CGImageRelease(imageRef);
+    
+    return image;
+}
+
 -(MKAnnotationView*)mapView:(MKMapView*)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     
     MKAnnotationView *view = nil;
@@ -775,7 +798,8 @@
                         break;
                 }
 
-                UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:[NSString stringWithFormat:@"%d.png", annotationGym.guardPokemonID]]];
+                UIImageView *imageView = [[UIImageView alloc] initWithImage:[self pokemonIcon:annotationGym.guardPokemonID]];
+
                 imageView.frame = CGRectMake(0, 0, 50, 50);
                 imageView.contentMode = UIViewContentModeScaleAspectFit;
                 view.leftCalloutAccessoryView = imageView;
