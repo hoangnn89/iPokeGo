@@ -1,1 +1,50 @@
 
+{
+	"pokestops": [],
+	"pokemons": [{
+		"stamina": -1,
+		"spawnpoint_id": "141833418s",
+		"pokemon_id": 27,
+		"name": "Sandshrew",
+		"longitude": -106.683892290395,
+		"latitude": 35.1489861231981,
+		"encounter_id": "13959720340219337581",
+		"disappear_time": 1474190490076,
+		"defense": -1,
+		"attack": -1
+	}, {
+		"stamina": -1,
+		"spawnpoint_id": "141830613s",
+		"pokemon_id": 16,
+		"name": "Pidgey",
+		"longitude": -106.683800164589,
+		"latitude": 35.1464931576286,
+		"encounter_id": "17351973679622325469",
+		"disappear_time": 1474190329860,
+		"defense": -1,
+		"attack": -1
+	}, {
+		"stamina": -1,
+		"spawnpoint_id": "141832702s",
+		"pokemon_id": 48,
+		"name": "Venonat",
+		"longitude": -106.683715,
+		"latitude": 35.148027,
+		"encounter_id": "18446744072267780788",
+		"disappear_time": 1474189866533,
+		"defense": -1,
+		"attack": -1
+	}, {
+		"stamina": -1,
+		"spawnpoint_id": "141832367s",
+		"pokemon_id": 42,
+		"name": "Golbat",
+		"longitude": -106.683393,
+		"latitude": 35.148134,
+		"encounter_id": "18446744071820654770",
+		"disappear_time": 1474189864019,
+		"defense": -1,
+		"attack": -1
+	}],
+	"gyms": []
+}
